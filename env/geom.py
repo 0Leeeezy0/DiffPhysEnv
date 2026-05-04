@@ -15,15 +15,18 @@ class geom:
         @ GEOM场景初始化
         batch_size:并行数量
         device:运行设备:cpu/cuda
+        requires_grad:需要梯度
         # domain_randomization:域随机化
     """
     def __init__(
         self, 
         batch_size: int, 
-        device: str
+        device: str,
+        requires_grad: bool
     ):
         self._batch_size = batch_size
         self._device = device
+        self._requires_grad = requires_grad
 
         self.geom_list = []
         self.robot_list = []
@@ -126,8 +129,8 @@ class geom:
             self.geom_list.append(
                 dict(
                     robot_list = single_geom_robot_list, 
-                    sphere_list = util.tensor_stack(single_geom_sphere_list, dim=0, size=(1,4), dtype=torch.float, device=self._device, requires_grad=True),
-                    cylinder_list = util.tensor_stack(single_geom_cylinder_list, dim=0, size=(1,5), dtype=torch.float, device=self._device, requires_grad=True)
+                    sphere_list = util.tensor_stack(single_geom_sphere_list, dim=0, size=(1,4), dtype=torch.float, device=self._device, requires_grad=self._requires_grad),
+                    cylinder_list = util.tensor_stack(single_geom_cylinder_list, dim=0, size=(1,5), dtype=torch.float, device=self._device, requires_grad=self._requires_grad)
                 )
             )
         """ 计算初始传感器值 """
@@ -190,15 +193,15 @@ class geom:
                 single_geom_obs['ang_vel'].append(robot.ang_vel)
                 single_geom_obs['ang'].append(util.rad_to_deg(robot.euler))
 
-            geom_obs['acc'].append(util.tensor_stack(single_geom_obs['acc'], dim=0, size=(3), dtype=torch.float, device=self._device, requires_grad=True))
-            geom_obs['vel'].append(util.tensor_stack(single_geom_obs['vel'], dim=0, size=(3), dtype=torch.float, device=self._device, requires_grad=True))
-            geom_obs['pos'].append(util.tensor_stack(single_geom_obs['pos'], dim=0, size=(3), dtype=torch.float, device=self._device, requires_grad=True))
-            geom_obs['ang_vel'].append(util.tensor_stack(single_geom_obs['ang_vel'], dim=0, size=(3), dtype=torch.float, device=self._device, requires_grad=True))
-            geom_obs['ang'].append(util.tensor_stack(single_geom_obs['ang'], dim=0, size=(3), dtype=torch.float, device=self._device, requires_grad=True))
-            geom_obs['distance'].append(util.tensor_stack(single_geom_obs['distance'], dim=0, size=(1), dtype=torch.float, device=self._device, requires_grad=True))
+            geom_obs['acc'].append(util.tensor_stack(single_geom_obs['acc'], dim=0, size=(3), dtype=torch.float, device=self._device, requires_grad=self._requires_grad))
+            geom_obs['vel'].append(util.tensor_stack(single_geom_obs['vel'], dim=0, size=(3), dtype=torch.float, device=self._device, requires_grad=self._requires_grad))
+            geom_obs['pos'].append(util.tensor_stack(single_geom_obs['pos'], dim=0, size=(3), dtype=torch.float, device=self._device, requires_grad=self._requires_grad))
+            geom_obs['ang_vel'].append(util.tensor_stack(single_geom_obs['ang_vel'], dim=0, size=(3), dtype=torch.float, device=self._device, requires_grad=self._requires_grad))
+            geom_obs['ang'].append(util.tensor_stack(single_geom_obs['ang'], dim=0, size=(3), dtype=torch.float, device=self._device, requires_grad=self._requires_grad))
+            geom_obs['distance'].append(util.tensor_stack(single_geom_obs['distance'], dim=0, size=(1), dtype=torch.float, device=self._device, requires_grad=self._requires_grad))
             geom_obs['is_collision'].append(util.tensor_stack(single_geom_obs['is_collision'], dim=0, size=(1), dtype=torch.bool, device=self._device, requires_grad=False))
-            geom_obs['depth'].append(util.tensor_stack(single_geom_obs['depth'], dim=0, size=(1,1), dtype=torch.float, device=self._device, requires_grad=True))
-            geom_obs['cloud_point'].append(util.tensor_stack(single_geom_obs['cloud_point'], dim=0, size=(1,1), dtype=torch.float, device=self._device, requires_grad=True))
+            geom_obs['depth'].append(util.tensor_stack(single_geom_obs['depth'], dim=0, size=(1,1), dtype=torch.float, device=self._device, requires_grad=self._requires_grad))
+            geom_obs['cloud_point'].append(util.tensor_stack(single_geom_obs['cloud_point'], dim=0, size=(1,1), dtype=torch.float, device=self._device, requires_grad=self._requires_grad))
                             
         return {
             'acc': torch.stack(geom_obs['acc'], dim=0),
@@ -320,15 +323,15 @@ class geom:
 
                 idx_robot += 1
 
-            geom_obs['acc'].append(util.tensor_stack(single_geom_obs['acc'], dim=0, size=(3), dtype=torch.float, device=self._device, requires_grad=True))
-            geom_obs['vel'].append(util.tensor_stack(single_geom_obs['vel'], dim=0, size=(3), dtype=torch.float, device=self._device, requires_grad=True))
-            geom_obs['pos'].append(util.tensor_stack(single_geom_obs['pos'], dim=0, size=(3), dtype=torch.float, device=self._device, requires_grad=True))
-            geom_obs['ang_vel'].append(util.tensor_stack(single_geom_obs['ang_vel'], dim=0, size=(3), dtype=torch.float, device=self._device, requires_grad=True))
-            geom_obs['ang'].append(util.tensor_stack(single_geom_obs['ang'], dim=0, size=(3), dtype=torch.float, device=self._device, requires_grad=True))
-            geom_obs['distance'].append(util.tensor_stack(single_geom_obs['distance'], dim=0, size=(1), dtype=torch.float, device=self._device, requires_grad=True))
+            geom_obs['acc'].append(util.tensor_stack(single_geom_obs['acc'], dim=0, size=(3), dtype=torch.float, device=self._device, requires_grad=self._requires_grad))
+            geom_obs['vel'].append(util.tensor_stack(single_geom_obs['vel'], dim=0, size=(3), dtype=torch.float, device=self._device, requires_grad=self._requires_grad))
+            geom_obs['pos'].append(util.tensor_stack(single_geom_obs['pos'], dim=0, size=(3), dtype=torch.float, device=self._device, requires_grad=self._requires_grad))
+            geom_obs['ang_vel'].append(util.tensor_stack(single_geom_obs['ang_vel'], dim=0, size=(3), dtype=torch.float, device=self._device, requires_grad=self._requires_grad))
+            geom_obs['ang'].append(util.tensor_stack(single_geom_obs['ang'], dim=0, size=(3), dtype=torch.float, device=self._device, requires_grad=self._requires_grad))
+            geom_obs['distance'].append(util.tensor_stack(single_geom_obs['distance'], dim=0, size=(1), dtype=torch.float, device=self._device, requires_grad=self._requires_grad))
             geom_obs['is_collision'].append(util.tensor_stack(single_geom_obs['is_collision'], dim=0, size=(1), dtype=torch.bool, device=self._device, requires_grad=False))
-            geom_obs['depth'].append(util.tensor_stack(single_geom_obs['depth'], dim=0, size=(1,1), dtype=torch.float, device=self._device, requires_grad=True))
-            geom_obs['cloud_point'].append(util.tensor_stack(single_geom_obs['cloud_point'], dim=0, size=(1,1), dtype=torch.float, device=self._device, requires_grad=True))
+            geom_obs['depth'].append(util.tensor_stack(single_geom_obs['depth'], dim=0, size=(1,1), dtype=torch.float, device=self._device, requires_grad=self._requires_grad))
+            geom_obs['cloud_point'].append(util.tensor_stack(single_geom_obs['cloud_point'], dim=0, size=(1,1), dtype=torch.float, device=self._device, requires_grad=self._requires_grad))
                 
             idx_geom += 1
         

@@ -14,6 +14,7 @@ class rigid:
     """
         @ 刚体初始化
         device:运行设备:cpu/cuda
+        requires_grad:需要梯度
         init_pos:初始位置:torch.tensor([x,y,z], dtype=torch.float, device=device, requires_grad=True):m
         init_euler:初始姿态角度:torch.tensor([x,y,z], dtype=torch.float, device=device, requires_grad=True):度
         mass:质量:kg
@@ -22,6 +23,7 @@ class rigid:
     def __init__(
         self,
         device: str,
+        requires_grad: bool,
         init_pos: torch.Tensor, 
         init_euler: torch.Tensor, 
         mass: float, 
@@ -30,6 +32,7 @@ class rigid:
         self.type = 'rigid'
 
         self._device = device
+        self._requires_grad = requires_grad
         self._init_pos = init_pos.detach()
         self._init_euler = util.deg_to_rad(init_euler.detach())
         self.pos = None
@@ -39,12 +42,12 @@ class rigid:
 
         self._g = 9.81
         self.sensor_list = []
-        self.cloest_distance = torch.zeros(1, device=self._device, dtype=torch.float, requires_grad=True).detach()
+        self.cloest_distance = torch.zeros(1, device=self._device, dtype=torch.float, requires_grad=self._requires_grad).detach()
         self.is_collision = False
-        self.acc = torch.zeros(3, dtype=torch.float, device=self._device, requires_grad=True).detach()
-        self.vel = torch.zeros(3, dtype=torch.float, device=self._device, requires_grad=True).detach()
-        self.ang_vel = torch.zeros(3, dtype=torch.float, device=self._device, requires_grad=True).detach()
-        self._G = torch.tensor([0.0, 0.0, -self.mass*self._g], dtype=torch.float, device=device, requires_grad=True).detach()
+        self.acc = torch.zeros(3, dtype=torch.float, device=self._device, requires_grad=self._requires_grad).detach()
+        self.vel = torch.zeros(3, dtype=torch.float, device=self._device, requires_grad=self._requires_grad).detach()
+        self.ang_vel = torch.zeros(3, dtype=torch.float, device=self._device, requires_grad=self._requires_grad).detach()
+        self._G = torch.tensor([0.0, 0.0, -self.mass*self._g], dtype=torch.float, device=device, requires_grad=self._requires_grad).detach()
 
         self._pose_set(init_pos.detach(), self._init_euler.detach())
     
@@ -61,11 +64,11 @@ class rigid:
     """
     def reset(self):
         self._pose_set(self._init_pos, self._init_euler)   
-        self.cloest_distance = torch.zeros(1, device=self._device, dtype=torch.float, requires_grad=True).detach()
+        self.cloest_distance = torch.zeros(1, device=self._device, dtype=torch.float, requires_grad=self._requires_grad).detach()
         self.is_collision = False
-        self.acc = torch.zeros(3, dtype=torch.float, device=self._device, requires_grad=True).detach()
-        self.vel = torch.zeros(3, dtype=torch.float, device=self._device, requires_grad=True).detach()
-        self.ang_vel = torch.zeros(3, dtype=torch.float, device=self._device, requires_grad=True).detach()
+        self.acc = torch.zeros(3, dtype=torch.float, device=self._device, requires_grad=self._requires_grad).detach()
+        self.vel = torch.zeros(3, dtype=torch.float, device=self._device, requires_grad=self._requires_grad).detach()
+        self.ang_vel = torch.zeros(3, dtype=torch.float, device=self._device, requires_grad=self._requires_grad).detach()
         for sensor_dict in self.sensor_list:
             """ 最近距离复位 """
             if sensor_dict['type'] == 'closest_dist':
@@ -77,7 +80,7 @@ class rigid:
     """
     def g_set(self, g: float):
         self._g = g
-        self._G[2] = torch.tensor([0.0, 0.0, -self.mass*self._g], dtype=torch.float, device=self._device, requires_grad=True)
+        self._G[2] = torch.tensor([0.0, 0.0, -self.mass*self._g], dtype=torch.float, device=self._device, requires_grad=self._requires_grad)
     
     """
         @ 刚体动力学解算
@@ -148,6 +151,7 @@ class drone:
     """
         @ 无人机初始化
         device:运行设备:cpu/cuda
+        requires_grad:需要梯度
         init_pos:初始位置:torch.tensor([x,y,z], dtype=torch.float, device=device, requires_grad=True):m
         init_euler:初始姿态角度:torch.tensor([x,y,z], dtype=torch.float, device=device, requires_grad=True):度
         mass:质量:kg
@@ -157,6 +161,7 @@ class drone:
     def __init__(
         self,
         device: str,
+        requires_grad: bool,
         init_pos: torch.Tensor, 
         init_euler: torch.Tensor, 
         mass: float, 
@@ -166,6 +171,7 @@ class drone:
         self.type = 'drone'
 
         self._device = device
+        self._requires_grad = requires_grad
         self._init_pos = init_pos.detach()
         self._init_euler = util.deg_to_rad(init_euler.detach())
         self.pos = None
@@ -176,12 +182,12 @@ class drone:
 
         self._g = 9.81
         self.sensor_list = []
-        self.cloest_distance = torch.zeros(1, device=self._device, dtype=torch.float, requires_grad=True).detach()
+        self.cloest_distance = torch.zeros(1, device=self._device, dtype=torch.float, requires_grad=self._requires_grad).detach()
         self.is_collision = False
-        self.acc = torch.zeros(3, dtype=torch.float, device=self._device, requires_grad=True).detach()
-        self.vel = torch.zeros(3, dtype=torch.float, device=self._device, requires_grad=True).detach()
-        self.ang_vel = torch.zeros(3, dtype=torch.float, device=self._device, requires_grad=True).detach()
-        self._G = torch.tensor([0.0, 0.0, -self.mass*self._g], dtype=torch.float, device=device, requires_grad=True).detach()
+        self.acc = torch.zeros(3, dtype=torch.float, device=self._device, requires_grad=self._requires_grad).detach()
+        self.vel = torch.zeros(3, dtype=torch.float, device=self._device, requires_grad=self._requires_grad).detach()
+        self.ang_vel = torch.zeros(3, dtype=torch.float, device=self._device, requires_grad=self._requires_grad).detach()
+        self._G = torch.tensor([0.0, 0.0, -self.mass*self._g], dtype=torch.float, device=device, requires_grad=self._requires_grad).detach()
 
         self._pose_set(init_pos.detach(), self._init_euler.detach())
     
@@ -198,11 +204,11 @@ class drone:
     """
     def reset(self):
         self._pose_set(self._init_pos, self._init_euler)   
-        self.cloest_distance = torch.zeros(1, device=self._device, dtype=torch.float, requires_grad=True).detach()
+        self.cloest_distance = torch.zeros(1, device=self._device, dtype=torch.float, requires_grad=self._requires_grad).detach()
         self.is_collision = False
-        self.acc = torch.zeros(3, dtype=torch.float, device=self._device, requires_grad=True).detach()
-        self.vel = torch.zeros(3, dtype=torch.float, device=self._device, requires_grad=True).detach()
-        self.ang_vel = torch.zeros(3, dtype=torch.float, device=self._device, requires_grad=True).detach()
+        self.acc = torch.zeros(3, dtype=torch.float, device=self._device, requires_grad=self._requires_grad).detach()
+        self.vel = torch.zeros(3, dtype=torch.float, device=self._device, requires_grad=self._requires_grad).detach()
+        self.ang_vel = torch.zeros(3, dtype=torch.float, device=self._device, requires_grad=self._requires_grad).detach()
         for sensor_dict in self.sensor_list:
             """ 最近距离复位 """
             if sensor_dict['type'] == 'closest_dist':
@@ -214,7 +220,7 @@ class drone:
     """
     def g_set(self, g: float):
         self._g = g
-        self._G[2] = torch.tensor([0.0, 0.0, -self.mass*self._g], dtype=torch.float, device=self._device, requires_grad=True)
+        self._G[2] = torch.tensor([0.0, 0.0, -self.mass*self._g], dtype=torch.float, device=self._device, requires_grad=self._requires_grad)
     
     """
         @ 无人机动力学解算
