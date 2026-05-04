@@ -143,10 +143,12 @@ scene.build()
 geom = geom.geom(
     batch_size=4,
     device=device,
+    requires_grad = True
 )
 for i in range(1):
     rigid_robot = robot.rigid(
         device = device,
+        requires_grad = True,
         init_pos = init_pos, 
         init_euler = init_euler, 
         mass = 0.33, 
